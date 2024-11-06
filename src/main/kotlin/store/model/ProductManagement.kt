@@ -13,11 +13,12 @@ class ProductManagement() {
 
     private fun getProductInfo(productInfo: String): Product {
         val product = productInfo.split(",").map { it.trim() }
+        //검증 로직 추가해야하는감..
         return Product(
             name = product[0],
             price = product[1].toInt(),
             quantity = product[2].toInt(),
-            promotion = product[3]
+            promotion = if (product[3] == "null") "" else product[3]
         )
     }
 
