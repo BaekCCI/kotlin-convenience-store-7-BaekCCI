@@ -7,7 +7,7 @@ class ProductManagement() {
     private val products: List<Product>
 
     init {
-        val inventory = java.io.File(INVENTORY_PATH).readLines()
+        val inventory = java.io.File(INVENTORY_PATH).readLines().drop(1)
         products = inventory.map { getProductInfo(it) }
     }
 
