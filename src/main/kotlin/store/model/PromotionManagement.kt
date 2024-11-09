@@ -1,4 +1,5 @@
 package store.model
+
 import camp.nextstep.edu.missionutils.DateTimes
 import java.time.LocalDate
 
@@ -32,5 +33,25 @@ class PromotionManagement {
             start_date = promotion[3],
             end_date = promotion[4]
         )
+    }
+
+    fun isPromotion(purchase: Map<String, Int>): Boolean {
+
+        promotionInfo.forEach {
+            if (purchase.containsKey(it.name)) return checkPromotionDate(it)
+        }
+        return false
+    }
+
+    private fun checkPromotionDate(promotion: Promotion): Boolean {
+        val (startYear, startMonth, startDay) = promotion.start_date.split("-").map { it.toInt() }
+        val startDate = LocalDate.of(startYear, startMonth, startDay)
+
+        val (endYear, endMonth, endDay) = promotion.end_date.split("-").map { it.toInt() }
+        val endDate = LocalDate.of(endYear, endMonth, endDay)
+
+        val today = DateTimes.now().toLocalDate()
+
+        return today.isAfter(startDate) && today.isBefore(endDate)
     }
 }
