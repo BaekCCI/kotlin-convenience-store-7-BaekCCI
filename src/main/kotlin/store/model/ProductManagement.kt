@@ -22,5 +22,8 @@ class ProductManagement() {
         )
     }
 
-    //상품 구매 시 상품 재고 업데이트 로직
+    fun updateProductInfo(){ //재고 업데이트
+
+    }
+
 }
