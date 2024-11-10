@@ -31,16 +31,38 @@ class PromotionController(
 
     //프로모션 상품 구매 수량과 재고 비교
     fun checkPromotionQuantity(product: Product, quantity: Int) {
-        if (product.quantity < quantity) {
-            val normalQuantity = quantity - product.quantity
+        val normalQuantity = quantity - product.quantity
+        if (normalQuantity > 0) {
             confirmListPrice(product.name, normalQuantity)
         } else {
-
+            addExtraItem(product, quantity)
         }
     }
 
-    fun isPossibleAddExtraItem() {
+    fun addExtraItem(product: Product, quantity: Int) {
+        val promotion = product.promotion
+        if (promotion != null) {
+            val remainder = quantity % (promotion.buy + promotion.get)
 
+            if (remainder == promotion.buy) {
+                isPossibleAddExtraItem(product, quantity)
+            } else if (remainder < promotion.buy) {
+                confirmListPrice(product.name, remainder)
+            }
+        }
+    }
+
+    fun isPossibleAddExtraItem(product: Product, quantity: Int) {
+        val promotion = product.promotion
+        if (promotion != null) {
+            val totalQuantityAfterAddExtra = quantity + promotion.get
+            if (totalQuantityAfterAddExtra > product.quantity) {
+                val normalQuantity = quantity - (product.quantity / (promotion.buy + promotion.get)) * (promotion.buy + promotion.get)
+                confirmListPrice(product.name, normalQuantity)
+            } else {
+                addExtraItem(product.name)
+            }
+        }
     }
 
     //일반결제 유도
@@ -48,7 +70,8 @@ class PromotionController(
         //yes or no -> 멤버십
     }
 
-    fun isNeedExtraItem(cart: MutableMap<String, Int>) {
+    //증정 상품 추가
+    fun addExtraItem(name: String) {
 
     }
 
