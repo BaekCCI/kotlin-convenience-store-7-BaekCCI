@@ -4,7 +4,7 @@ const val INVENTORY_PATH = "src/main/resources/products.md"
 
 //재고 관리 클래스
 class ProductManagement(private val promotionManagement: PromotionManagement) {
-    val products: List<Product>
+    private val products: List<Product>
 
     init {
         val inventory = java.io.File(INVENTORY_PATH).readLines().drop(1)
@@ -23,6 +23,10 @@ class ProductManagement(private val promotionManagement: PromotionManagement) {
         )
     }
 
+    fun get(): List<Product> {
+        return products
+    }
+
     fun checkItemInInventory(name: String): Boolean {
         return products.any { it.name == name }
     }
@@ -36,15 +40,14 @@ class ProductManagement(private val promotionManagement: PromotionManagement) {
         return false
     }
 
-    fun checkIsPromotion(cart: MutableMap<String, Int>): Boolean {
-        cart.forEach { (key, value) ->
-            products.forEach {
-                if (it.name == key && it.promotion != null) {
-                    return promotionManagement.checkPromotionDate(it.promotion!!)
-                }
+    fun checkIsPromotion(name: String, quantity: Int): MutableMap<Product, Int> {
+        val promotionItems: MutableMap<Product, Int> = mutableMapOf()
+        products.forEach {
+            if (it.name == name && it.promotion != null && promotionManagement.checkPromotionDate(it.promotion!!)) {
+                promotionItems[it] = quantity
             }
         }
-        return false
+        return promotionItems
     }
 
     fun updateProductInfo() { //재고 업데이트

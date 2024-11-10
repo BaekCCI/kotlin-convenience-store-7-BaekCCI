@@ -4,41 +4,34 @@ import store.model.ProductManagement
 import store.model.PromotionManagement
 import store.model.Purchase
 import store.view.InputView
+
 const val ITEM_REGEX = "^\\[\\S+-\\d+](,\\[\\S+-\\d+])*?$|^\\S+-\\d+$"
 
 
 class Controller {
     private val inputView = InputView()
     private val promotionManagement = PromotionManagement()
-    private val productManagement=ProductManagement(promotionManagement)
+    private val productManagement = ProductManagement(promotionManagement)
 
-    fun start(){
-        do{
+    fun start() {
+        do {
             // 구매 로직
             val items = getItems()
-            checkPromotion(items)
+            val promotionController = PromotionController(items, productManagement)
+            promotionController.startCheckPromotion()
 
-
-
-        }while(inputView.checkAdditionalPurchase()=="Y" || inputView.checkAdditionalPurchase()=="y")
+        } while (inputView.checkAdditionalPurchase() == "Y" || inputView.checkAdditionalPurchase() == "y")
     }
-    fun getItems() : Purchase{
-        while(true){
-            try{
+
+    fun getItems(): Purchase {
+        while (true) {
+            try {
                 val items = inputView.readItem()
-                return Purchase(items,productManagement)
-            }catch (e : IllegalArgumentException){
+                return Purchase(items, productManagement)
+            } catch (e: IllegalArgumentException) {
                 println(e.message)
             }
         }
     }
-    fun checkPromotion(items : Purchase){
-        if (items.checkPromotion()){
 
-        }
-
-    }
-    fun checkPromotionBenefit(){
-
-    }
 }

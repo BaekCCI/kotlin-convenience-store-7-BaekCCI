@@ -48,13 +48,13 @@ class Purchase(val items: String, val productManagement: ProductManagement) {
                     quantity
                 )
             ) { "[ERROR] 재고 수량을 초과하여 구매할 수 없습니다. 다시 입력해 주세요." }
-            cart[name] = cart.getOrDefault(name, 0)+quantity
+            cart[name] = cart.getOrDefault(name, 0) + quantity
         }
     }
-    fun checkPromotion():Boolean{
-        return productManagement.checkIsPromotion(cart)
-    }
 
+    fun get(): MutableMap<String, Int> {
+        return cart
+    }
 
 
 }

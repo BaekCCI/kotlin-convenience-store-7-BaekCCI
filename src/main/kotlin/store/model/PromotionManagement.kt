@@ -6,14 +6,6 @@ import java.time.LocalDate
 const val PROMOTION_INFO_PATH = "src/main/resources/promotions.md"
 const val FIRST_LINE = 1
 
-data class Promotion(
-    val name: String,
-    val buy: Int,
-    val get: Int,
-    val start_date: String,
-    val end_date: String
-)
-
 // 프로모션 관리 : 프로모션 적용 상품인지 확인, 프로모션 적용 수량인지 확인.
 class PromotionManagement {
     private val promotionInfo: List<Promotion>
@@ -34,8 +26,9 @@ class PromotionManagement {
             end_date = promotion[4]
         )
     }
-    fun get(name : String):Promotion?{
-        return promotionInfo.find{it.name == name}
+
+    fun get(name: String): Promotion? {
+        return promotionInfo.find { it.name == name }
     }
 
     fun checkPromotionDate(promotion: Promotion): Boolean {
