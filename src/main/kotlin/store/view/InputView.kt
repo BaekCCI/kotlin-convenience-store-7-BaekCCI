@@ -9,6 +9,9 @@ enum class InputMessage(private val message: String) {
     MEMBERSHIP_DISCOUNT("멤버십 할인을 받으시겠습니까? (Y/N)"),
     ADDITIONAL_PURCHASE("감사합니다. 구매하고 싶은 다른 상품이 있나요? (Y/N)");
 
+    fun get():String{
+        return message
+    }
     fun get(name: String): String { //변수를 받지 않는 메세지도 get()으로 통일을 시키는게 좋을까?
         return message.format(name)
     }
@@ -20,7 +23,7 @@ enum class InputMessage(private val message: String) {
 
 class InputView {
     fun readItem(): String {
-        println(InputMessage.PURCHASE_PRODUCT)
+        println(InputMessage.PURCHASE_PRODUCT.get())
         return Console.readLine()
     }
 
@@ -35,12 +38,12 @@ class InputView {
     }
 
     fun checkMembershipDiscount(): String {
-        println(InputMessage.MEMBERSHIP_DISCOUNT)
+        println(InputMessage.MEMBERSHIP_DISCOUNT.get())
         return Console.readLine()
     }
 
     fun checkAdditionalPurchase(): String {
-        println(InputMessage.ADDITIONAL_PURCHASE)
+        println(InputMessage.ADDITIONAL_PURCHASE.get())
         return Console.readLine()
     }
 }
