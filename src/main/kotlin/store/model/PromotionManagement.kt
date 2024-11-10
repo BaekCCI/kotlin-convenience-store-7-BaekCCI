@@ -34,16 +34,11 @@ class PromotionManagement {
             end_date = promotion[4]
         )
     }
-
-    fun isPromotion(purchase: Map<String, Int>): Boolean {
-
-        promotionInfo.forEach {
-            if (purchase.containsKey(it.name)) return checkPromotionDate(it)
-        }
-        return false
+    fun get(name : String):Promotion?{
+        return promotionInfo.find{it.name == name}
     }
 
-    private fun checkPromotionDate(promotion: Promotion): Boolean {
+    fun checkPromotionDate(promotion: Promotion): Boolean {
         val (startYear, startMonth, startDay) = promotion.start_date.split("-").map { it.toInt() }
         val startDate = LocalDate.of(startYear, startMonth, startDay)
 
@@ -54,4 +49,6 @@ class PromotionManagement {
 
         return today.isAfter(startDate) && today.isBefore(endDate)
     }
+
+
 }
