@@ -13,16 +13,28 @@ class ProductManagement() {
 
     private fun getProductInfo(productInfo: String): Product {
         val product = productInfo.split(",").map { it.trim() }
-        //검증 로직 추가해야하는감..
+        val promotionQuantity = if (product[3] != "null") product[3].toInt() else 0
+
         return Product(
             name = product[0],
             price = product[1].toInt(),
-            quantity = product[2].toInt(),
-            promotion = if (product[3] == "null") "" else product[3]
+            entireQuantity = product[2].toInt() + promotionQuantity,
+            promotionQuantity = promotionQuantity,
+            promotion = product[3]
         )
     }
 
-    fun updateProductInfo(){ //재고 업데이트
+    fun checkItemInInventory(name: String): Boolean {
+        return products.any { it.name == name }
+    }
+
+    fun checkItemQuantity(name: String, quantity: Int): Boolean {
+        val product = products.find { it.name == name }
+        return product?.entireQuantity?.let { it >= quantity } ?: false
+    }
+
+
+    fun updateProductInfo() { //재고 업데이트
 
     }
 
