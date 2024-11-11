@@ -20,9 +20,10 @@ class Controller {
             val items = getItems()
             val promotionController = PromotionController(items, productManagement,receipt)
             promotionController.startCheckPromotion()
-
-
-        } while (inputView.checkAdditionalPurchase() == "Y" || inputView.checkAdditionalPurchase() == "y")
+            val membershipController = MembershipController(receipt)
+            membershipController.startMembership()
+            displayReceipt()
+        } while (checkAdditionalPurchase()=="y")
     }
     fun displayProduct(){
         val products = productManagement.get()
@@ -30,6 +31,9 @@ class Controller {
         products.forEach {
             outputView.printProducts(it.name,it.price,it.quantity, it.promotion?.name)
         }
+    }
+    fun displayReceipt(){
+
     }
 
     fun getItems(): Purchase {
@@ -41,6 +45,20 @@ class Controller {
                 println(e.message)
             }
         }
+    }
+    fun checkAdditionalPurchase():String{
+        while(true) {
+            try {
+                val input = inputView.checkAdditionalPurchase().lowercase()
+                require(validYesOrNo(input)) { "[ERROR] 잘못된 입력입니다. 다시 입력해 주세요." }
+                return input
+            } catch (e: IllegalArgumentException) {
+                println(e.message)
+            }
+        }
+    }
+    private fun validYesOrNo(input: String): Boolean {
+        return input == "y" || input == "n"
     }
 
 }

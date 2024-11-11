@@ -18,7 +18,7 @@ class PromotionController(
     fun startCheckPromotion() {
         val cart = items.get()
         checkPromotion(cart)
-        receipt.setGeneralProduct(cart, productManagement)
+        receipt.setReceipt(cart, productManagement)
     }
 
     //프로모션 상품이 존재하는지 확인
