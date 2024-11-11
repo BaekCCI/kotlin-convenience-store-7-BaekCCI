@@ -1,5 +1,6 @@
 package store.controller
 
+import store.Validator
 import store.model.*
 import store.view.InputView
 import store.view.OutputView
@@ -10,6 +11,7 @@ class Controller {
     private val promotionManagement = PromotionManagement()
     private val productManagement = ProductManagement(promotionManagement)
     private val receipt = Receipt()
+    private val validator = Validator()
 
     fun start() {
         do {
@@ -52,16 +54,12 @@ class Controller {
             try {
                 receipt.reset()
                 val input = inputView.checkAdditionalPurchase().lowercase()
-                require(validYesOrNo(input)) { "[ERROR] 잘못된 입력입니다. 다시 입력해 주세요." }
+                validator.validYesOrNo(input)
                 return input
             } catch (e: IllegalArgumentException) {
                 println(e.message)
             }
         }
-    }
-
-    private fun validYesOrNo(input: String): Boolean {
-        return input == "y" || input == "n"
     }
 
 }

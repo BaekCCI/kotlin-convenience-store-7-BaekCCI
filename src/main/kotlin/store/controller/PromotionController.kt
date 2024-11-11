@@ -1,5 +1,6 @@
 package store.controller
 
+import store.Validator
 import store.model.Product
 import store.model.ProductManagement
 import store.model.Purchase
@@ -12,7 +13,8 @@ class PromotionController(
     private val receipt: Receipt
 ) {
     private val inputView = InputView()
-    private var promotionItems:MutableMap<Product, Int> = mutableMapOf()
+    private var promotionItems: MutableMap<Product, Int> = mutableMapOf()
+    private val validator = Validator()
 
 
     fun startCheckPromotion() {
@@ -24,9 +26,9 @@ class PromotionController(
     //프로모션 상품이 존재하는지 확인
     private fun checkPromotion(cart: MutableMap<String, Int>) {
         cart.forEach { (name, purchaseQuantity) ->
-            val product = productManagement.getPromotionItems(name,purchaseQuantity)
-            if(product!=null){
-                promotionItems[product]=purchaseQuantity
+            val product = productManagement.getPromotionItems(name, purchaseQuantity)
+            if (product != null) {
+                promotionItems[product] = purchaseQuantity
             }
         }
         if (promotionItems.isNotEmpty()) {
@@ -76,8 +78,7 @@ class PromotionController(
         if (promotion != null) {
             val totalQuantityAfterAddExtra = quantity + promotion.get
             if (totalQuantityAfterAddExtra > product.quantity) {
-                val remainder =
-                    quantity - (product.quantity / (promotion.buy + promotion.get)) * (promotion.buy + promotion.get)
+                val remainder = quantity % (promotion.buy + promotion.get)
                 receipt.addPromotion(product, quantity - remainder)
                 confirmNoDisCount(product, remainder)
             } else {
@@ -100,7 +101,7 @@ class PromotionController(
         while (true) {
             try {
                 val input = inputView.confirmNoDiscount(name, remainder).lowercase()
-                require(validYesOrNo(input)) { "[ERROR] 잘못된 입력입니다. 다시 입력해 주세요." }
+                validator.validYesOrNo(input)
                 return input
             } catch (e: IllegalArgumentException) {
                 println(e.message)
@@ -123,16 +124,12 @@ class PromotionController(
         while (true) {
             try {
                 val input = inputView.addExtraItem(name).lowercase()
-                require(validYesOrNo(input)) { "[ERROR] 잘못된 입력입니다. 다시 입력해 주세요." }
+                validator.validYesOrNo(input)
                 return input
             } catch (e: IllegalArgumentException) {
                 println(e.message)
             }
         }
-    }
-
-    private fun validYesOrNo(input: String): Boolean {
-        return input == "y" || input == "n"
     }
 
 }

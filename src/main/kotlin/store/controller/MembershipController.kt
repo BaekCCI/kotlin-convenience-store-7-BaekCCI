@@ -1,10 +1,12 @@
 package store.controller
 
+import store.Validator
 import store.model.Receipt
 import store.view.InputView
 
 class MembershipController(private val receipt : Receipt) {
     val inputView = InputView()
+    private val validator = Validator()
 
     fun startMembership(){
         val isMember = checkIsMember()
@@ -17,7 +19,7 @@ class MembershipController(private val receipt : Receipt) {
         while(true){
             try {
                 val isMember = inputView.checkMembershipDiscount().lowercase()
-                require(validYesOrNo(isMember)){"[ERROR] 잘못된 입력입니다. 다시 입력해 주세요."}
+                validator.validYesOrNo(isMember)
                 return isMember
             }catch(e:IllegalArgumentException){
                 println(e.message)
@@ -25,7 +27,5 @@ class MembershipController(private val receipt : Receipt) {
         }
 
     }
-    private fun validYesOrNo(input: String): Boolean {
-        return input == "y" || input == "n"
-    }
+
 }
