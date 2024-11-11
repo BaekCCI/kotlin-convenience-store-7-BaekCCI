@@ -5,5 +5,4 @@ data class Product(
     var price: Int,
     var quantity: Int,
     var promotion: Promotion?
-) {
-}
+)

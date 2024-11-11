@@ -50,11 +50,21 @@ class ProductManagement(private val promotionManagement: PromotionManagement) {
     }
 
     fun updateProduct(receipt: Receipt) { //재고 업데이트
-        receipt.entireProduct.forEach { (product,quantity)->
-            val productInInventory = products.find{it.name == product.name && it.promotion == product.promotion}
-            if(productInInventory!=null){
-                productInInventory.quantity -= quantity
+        receipt.entireProduct.forEach { (product, quantity) ->
+            val productInInventory = products.find { it.name == product.name && it.promotion == product.promotion }
+            if (productInInventory != null) {
+                if (productInInventory.quantity - quantity < 0) {
+                    handleGeneralProduct(product, quantity - productInInventory.quantity)
+                    productInInventory.quantity = 0
+                } else productInInventory.quantity -= quantity
             }
+        }
+    }
+
+    private fun handleGeneralProduct(product: Product, quantity: Int) {
+        val productInInventory = products.find { it.name == product.name && it.promotion == null }
+        if (productInInventory != null) {
+            productInInventory.quantity -= quantity
         }
     }
 
