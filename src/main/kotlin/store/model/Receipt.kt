@@ -1,6 +1,7 @@
 package store.model
 
 class Receipt {
+    val entireProduct: MutableMap<Product,Int> = mutableMapOf()
     val generalProduct: MutableMap<Product, Int> = mutableMapOf()
     val promotionProduct: MutableMap<Product, Int> = mutableMapOf()
     val extraProduct: MutableMap<Product, Int> = mutableMapOf()
@@ -15,12 +16,24 @@ class Receipt {
 
     fun setReceipt(cart: MutableMap<String, Int>, productManagement: ProductManagement) {
         setGeneralProduct(cart, productManagement)
+        setEntireProduct()
         addExtraProduct()
         setTotalPrice()
         setDiscountPromotion()
+        println(entireProduct)
+        println(generalProduct)
+        println(promotionProduct)
+    }
+    private fun setEntireProduct(){
+        generalProduct.forEach { (product,quantity)->
+            entireProduct[product]=entireProduct.getOrDefault(product,0)+quantity
+        }
+        promotionProduct.forEach { (product,quantity)->
+            entireProduct[product]=entireProduct.getOrDefault(product,0)+quantity
+        }
     }
 
-    fun setGeneralProduct(cart: MutableMap<String, Int>, productManagement: ProductManagement) {
+    private fun setGeneralProduct(cart: MutableMap<String, Int>, productManagement: ProductManagement) {
         val products = productManagement.get()
         cart.forEach { (name, quantity) ->
             val product = products.find { it.name == name }
@@ -33,14 +46,14 @@ class Receipt {
         }
     }
 
-    fun addExtraProduct() {
+    private fun addExtraProduct() {
         promotionProduct.forEach { (product, quantity) ->
             val promotion = product.promotion
             extraProduct[product] = quantity / (promotion!!.get + promotion.buy)
         }
     }
 
-    fun setTotalPrice() {
+    private fun setTotalPrice() {
         generalProduct.forEach { (product, quantity) ->
             totalPrice += product.price * quantity
         }
@@ -49,7 +62,7 @@ class Receipt {
         }
     }
 
-    fun setDiscountPromotion() {
+    private fun setDiscountPromotion() {
         extraProduct.forEach { (product, quantity) ->
             discountPromotion += product.price * quantity
         }
@@ -65,6 +78,5 @@ class Receipt {
     fun setResultPrice() {
         resultPrice = totalPrice - discountPromotion - discountMembership.toInt()
     }
-
 
 }

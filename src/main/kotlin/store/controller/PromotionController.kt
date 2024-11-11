@@ -12,7 +12,7 @@ class PromotionController(
     private val receipt: Receipt
 ) {
     private val inputView = InputView()
-    private var promotionItems: Map<Product, Int> = mapOf()
+    private var promotionItems:MutableMap<Product, Int> = mutableMapOf()
 
 
     fun startCheckPromotion() {
@@ -23,24 +23,27 @@ class PromotionController(
 
     //프로모션 상품이 존재하는지 확인
     private fun checkPromotion(cart: MutableMap<String, Int>) {
-        cart.forEach { (name, quantity) ->
-            promotionItems = productManagement.getPromotionItems(name, quantity)
+        cart.forEach { (name, purchaseQuantity) ->
+            val product = productManagement.getPromotionItems(name,purchaseQuantity)
+            if(product!=null){
+                promotionItems[product]=purchaseQuantity
+            }
         }
         if (promotionItems.isNotEmpty()) {
-            promotionItems.forEach { (product, quantity) ->
-                checkPromotionQuantity(product, quantity)
+            promotionItems.forEach { (product, purchaseQuantity) ->
+                checkPromotionQuantity(product, purchaseQuantity)
             }
         }
     }
 
     //프로모션 상품 구매 수량과 재고 비교
-    private fun checkPromotionQuantity(product: Product, quantity: Int) {
-        var normalQuantity = quantity - product.quantity
+    private fun checkPromotionQuantity(product: Product, purchaseQuantity: Int) {
+        var normalQuantity = purchaseQuantity - product.quantity
         if (normalQuantity > 0) {
-            addPromotionProducts(product, quantity)
+            addPromotionProducts(product, purchaseQuantity)
             confirmNoDisCount(product, normalQuantity)
         } else {
-            checkAddExtraItem(product, quantity)
+            checkAddExtraItem(product, purchaseQuantity)
         }
     }
 
@@ -53,13 +56,13 @@ class PromotionController(
     }
 
     //프로모션 적용 조건 충족 확인
-    private fun checkAddExtraItem(product: Product, quantity: Int) {
+    private fun checkAddExtraItem(product: Product, purchaseQuantity: Int) {
         val promotion = product.promotion
         if (promotion != null) {
-            val remainder = quantity % (promotion.buy + promotion.get)
-            if (remainder == 0) receipt.addPromotion(product, quantity)
+            val remainder = purchaseQuantity % (promotion.buy + promotion.get)
+            if (remainder == 0) receipt.addPromotion(product, purchaseQuantity)
             else if (remainder == promotion.buy) {
-                isPossibleAddExtraItem(product, quantity)
+                isPossibleAddExtraItem(product, purchaseQuantity)
             } else if (remainder < promotion.buy) { //
                 confirmNoDisCount(product, remainder)
             }

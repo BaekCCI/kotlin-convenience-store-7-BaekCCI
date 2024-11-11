@@ -23,6 +23,7 @@ class Controller {
             val membershipController = MembershipController(receipt)
             membershipController.startMembership()
             displayReceipt()
+            productManagement.updateProduct(receipt)
         } while (checkAdditionalPurchase()=="y")
     }
     fun displayProduct(){
@@ -33,7 +34,7 @@ class Controller {
         }
     }
     fun displayReceipt(){
-
+        outputView.printReceipt(receipt)
     }
 
     fun getItems(): Purchase {
