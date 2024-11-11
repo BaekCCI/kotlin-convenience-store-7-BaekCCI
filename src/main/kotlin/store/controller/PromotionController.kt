@@ -8,20 +8,21 @@ import store.view.InputView
 
 class PromotionController(
     private val items: Purchase,
-    private val productManagement: ProductManagement
+    private val productManagement: ProductManagement,
+    private val receipt: Receipt
 ) {
     private val inputView = InputView()
     private var promotionItems: Map<Product, Int> = mapOf()
-    private val receipt = Receipt()
 
 
     fun startCheckPromotion() {
         val cart = items.get()
         checkPromotion(cart)
+        receipt.setGeneralProduct(cart, productManagement)
     }
 
     //프로모션 상품이 존재하는지 확인
-    fun checkPromotion(cart: MutableMap<String, Int>) {
+    private fun checkPromotion(cart: MutableMap<String, Int>) {
         cart.forEach { (name, quantity) ->
             promotionItems = productManagement.getPromotionItems(name, quantity)
         }
@@ -30,63 +31,68 @@ class PromotionController(
                 checkPromotionQuantity(product, quantity)
             }
         }
-
     }
+
     //프로모션 상품 구매 수량과 재고 비교
-    fun checkPromotionQuantity(product: Product, quantity: Int) {
+    private fun checkPromotionQuantity(product: Product, quantity: Int) {
         var normalQuantity = quantity - product.quantity
         if (normalQuantity > 0) {
-            addPromotionProducts(product,quantity)
-            confirmNoDisCount(product.name, normalQuantity)
+            addPromotionProducts(product, quantity)
+            confirmNoDisCount(product, normalQuantity)
         } else {
             checkAddExtraItem(product, quantity)
         }
     }
+
     //영수증에 프로모션 아이템 추가
-    fun addPromotionProducts(product: Product, quantity: Int){
+    private fun addPromotionProducts(product: Product, quantity: Int) {
         val promotion = product.promotion
-        val promotionProductQuantity = (product.quantity/(promotion!!.get+ promotion.buy))*(promotion.get+ promotion.buy)
-        receipt.addPromotion(product,promotionProductQuantity)
+        val promotionProductQuantity =
+            (product.quantity / (promotion!!.get + promotion.buy)) * (promotion.get + promotion.buy)
+        receipt.addPromotion(product, promotionProductQuantity)
     }
+
     //프로모션 적용 조건 충족 확인
-    fun checkAddExtraItem(product: Product, quantity: Int) {
+    private fun checkAddExtraItem(product: Product, quantity: Int) {
         val promotion = product.promotion
         if (promotion != null) {
             val remainder = quantity % (promotion.buy + promotion.get)
-            if(remainder == 0) receipt.addPromotion(product,quantity)
+            if (remainder == 0) receipt.addPromotion(product, quantity)
             else if (remainder == promotion.buy) {
                 isPossibleAddExtraItem(product, quantity)
             } else if (remainder < promotion.buy) { //
-                confirmNoDisCount(product.name, remainder)
+                confirmNoDisCount(product, remainder)
             }
         }
     }
+
     //증정 가능 유무(상품 증정 시 프로모션 재고 보다 많은가)
-    fun isPossibleAddExtraItem(product: Product, quantity: Int) {
+    private fun isPossibleAddExtraItem(product: Product, quantity: Int) {
         val promotion = product.promotion
         if (promotion != null) {
             val totalQuantityAfterAddExtra = quantity + promotion.get
             if (totalQuantityAfterAddExtra > product.quantity) {
-                val remainder = quantity - (product.quantity / (promotion.buy + promotion.get)) * (promotion.buy + promotion.get)
-                receipt.addPromotion(product,quantity-remainder)
-                confirmNoDisCount(product.name, remainder)
+                val remainder =
+                    quantity - (product.quantity / (promotion.buy + promotion.get)) * (promotion.buy + promotion.get)
+                receipt.addPromotion(product, quantity - remainder)
+                confirmNoDisCount(product, remainder)
             } else {
-                addExtraItem(product,quantity)
+                addExtraItem(product, quantity)
             }
         }
     }
 
-    fun confirmNoDisCount(name: String, remainder: Int) {
-        val input = getConfirmNoDisCount(name, remainder)
+    //할인 불가 -> 일반결제
+    private fun confirmNoDisCount(product: Product, remainder: Int) {
+        val input = askConfirmNoDisCount(product.name, remainder)
         if (input == "y") {
 
         } else if (input == "n") {
-            //cart에서 삭제
+            items.cancelPurchase(product.name, remainder)
         }
     }
 
-    //할인 불가 -> 일반결제
-    fun getConfirmNoDisCount(name: String, remainder: Int): String {
+    private fun askConfirmNoDisCount(name: String, remainder: Int): String {
         while (true) {
             try {
                 val input = inputView.confirmNoDiscount(name, remainder).lowercase()
@@ -99,16 +105,17 @@ class PromotionController(
     }
 
     //증정 상품 추가
-    fun addExtraItem(product: Product, quantity : Int) {
+    private fun addExtraItem(product: Product, quantity: Int) {
         val input = askAddExtraItem(product.name)
         if (input == "y") {
-            receipt.addPromotion(product,quantity+product.promotion!!.get)
+            receipt.addPromotion(product, quantity + product.promotion!!.get)
+            items.addPurchase(product.name, product.promotion!!.get)
         } else if (input == "n") {
-            //cart에서 삭제
+            receipt.addPromotion(product, quantity - product.promotion!!.buy)
         }
     }
 
-    fun askAddExtraItem(name: String): String {
+    private fun askAddExtraItem(name: String): String {
         while (true) {
             try {
                 val input = inputView.addExtraItem(name).lowercase()
@@ -120,7 +127,7 @@ class PromotionController(
         }
     }
 
-    fun validYesOrNo(input: String): Boolean {
+    private fun validYesOrNo(input: String): Boolean {
         return input == "y" || input == "n"
     }
 

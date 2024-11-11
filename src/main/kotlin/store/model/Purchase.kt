@@ -55,6 +55,20 @@ class Purchase(val items: String, val productManagement: ProductManagement) {
     fun get(): MutableMap<String, Int> {
         return cart
     }
+    fun cancelPurchase(name : String, quantity : Int){
+        println(cart)
+        if(cart.containsKey(name)){
+            val currentQuantity = cart[name] ?: 0
+            cart[name] = currentQuantity-quantity
+        }
+        println(cart)
+    }
+    fun addPurchase(name:String,quantity : Int){
+        if(cart.containsKey(name)){
+            val currentQuantity = cart[name]?:0
+            cart[name] = currentQuantity+quantity
+        }
+    }
     fun getResult(){
 
     }

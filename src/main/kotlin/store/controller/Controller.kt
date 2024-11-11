@@ -1,9 +1,6 @@
 package store.controller
 
-import store.model.Product
-import store.model.ProductManagement
-import store.model.PromotionManagement
-import store.model.Purchase
+import store.model.*
 import store.view.InputView
 import store.view.OutputView
 
@@ -15,15 +12,15 @@ class Controller {
     private val outputView = OutputView()
     private val promotionManagement = PromotionManagement()
     private val productManagement = ProductManagement(promotionManagement)
+    private val receipt = Receipt()
 
     fun start() {
         do {
-            // 구매 로직
-
             displayProduct()
             val items = getItems()
-            val promotionController = PromotionController(items, productManagement)
+            val promotionController = PromotionController(items, productManagement,receipt)
             promotionController.startCheckPromotion()
+
 
         } while (inputView.checkAdditionalPurchase() == "Y" || inputView.checkAdditionalPurchase() == "y")
     }
