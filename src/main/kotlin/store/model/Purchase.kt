@@ -55,6 +55,9 @@ class Purchase(val items: String, val productManagement: ProductManagement) {
     fun get(): MutableMap<String, Int> {
         return cart
     }
+    fun getResult(){
+
+    }
 
 
 }

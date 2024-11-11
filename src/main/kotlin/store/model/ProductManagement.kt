@@ -40,7 +40,7 @@ class ProductManagement(private val promotionManagement: PromotionManagement) {
         return false
     }
 
-    fun checkIsPromotion(name: String, quantity: Int): MutableMap<Product, Int> {
+    fun getPromotionItems(name: String, quantity: Int): MutableMap<Product, Int> {
         val promotionItems: MutableMap<Product, Int> = mutableMapOf()
         products.forEach {
             if (it.name == name && it.promotion != null && promotionManagement.checkPromotionDate(it.promotion!!)) {
