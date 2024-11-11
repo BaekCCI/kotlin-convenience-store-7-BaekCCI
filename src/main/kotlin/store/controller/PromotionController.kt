@@ -4,15 +4,18 @@ import store.model.Product
 import store.model.ProductManagement
 import store.model.Purchase
 import store.view.InputView
+import store.view.OutputView
 
 class PromotionController(
     private val items: Purchase,
     private val productManagement: ProductManagement
 ) {
     private val inputView = InputView()
+    private val outputView = OutputView()
     private var promotionItems: Map<Product, Int> = mapOf()
 
     fun startCheckPromotion() {
+        checkPromotion(items.get())
 
 
     }
@@ -33,13 +36,13 @@ class PromotionController(
     fun checkPromotionQuantity(product: Product, quantity: Int) {
         val normalQuantity = quantity - product.quantity
         if (normalQuantity > 0) {
-            confirmListPrice(product.name, normalQuantity)
+            confirmNoDisCount(product.name, normalQuantity)
         } else {
-            addExtraItem(product, quantity)
+            checkAddExtraItem(product, quantity)
         }
     }
 
-    fun addExtraItem(product: Product, quantity: Int) {
+    fun checkAddExtraItem(product: Product, quantity: Int) {
         val promotion = product.promotion
         if (promotion != null) {
             val remainder = quantity % (promotion.buy + promotion.get)
@@ -47,7 +50,7 @@ class PromotionController(
             if (remainder == promotion.buy) {
                 isPossibleAddExtraItem(product, quantity)
             } else if (remainder < promotion.buy) {
-                confirmListPrice(product.name, remainder)
+                confirmNoDisCount(product.name, remainder)
             }
         }
     }
@@ -57,22 +60,61 @@ class PromotionController(
         if (promotion != null) {
             val totalQuantityAfterAddExtra = quantity + promotion.get
             if (totalQuantityAfterAddExtra > product.quantity) {
-                val normalQuantity = quantity - (product.quantity / (promotion.buy + promotion.get)) * (promotion.buy + promotion.get)
-                confirmListPrice(product.name, normalQuantity)
+                val remainder = quantity - (product.quantity / (promotion.buy + promotion.get)) * (promotion.buy + promotion.get)
+                confirmNoDisCount(product.name, remainder)
             } else {
                 addExtraItem(product.name)
             }
         }
     }
 
-    //일반결제 유도
-    fun confirmListPrice(name: String, quantity: Int) {
-        //yes or no -> 멤버십
+    fun confirmNoDisCount(name: String, remainder: Int) {
+        val input = getConfirmNoDisCount(name, remainder)
+        if (input == "y") {
+            //일반재고를 차감
+        } else if (input == "n") {
+            //
+        }
+    }
+
+    //할인 불가 -> 일반결제
+    fun getConfirmNoDisCount(name: String, remainder: Int): String {
+        while (true) {
+            try {
+                val input = inputView.confirmNoDiscount(name, remainder).lowercase()
+                require(validYesOrNo(input)) { "[ERROR] 잘못된 입력입니다. 다시 입력해 주세요." }
+                return input
+            } catch (e: IllegalArgumentException) {
+                println(e.message)
+            }
+        }
     }
 
     //증정 상품 추가
     fun addExtraItem(name: String) {
+        val input = askAddExtraItem(name)
+        if (input == "y") {
 
+        } else if (input == "n") {
+
+        }
+    }
+
+    fun askAddExtraItem(name: String): String {
+        while (true) {
+            try {
+                val input = inputView.addExtraItem(name).lowercase()
+                require(validYesOrNo(input)) { "[ERROR] 잘못된 입력입니다. 다시 입력해 주세요." }
+                return input
+            } catch (e: IllegalArgumentException) {
+                println(e.message)
+            }
+        }
+    }
+
+    fun validYesOrNo(input: String): Boolean {
+        if (input == "y" || input == "n") return true
+        return false
     }
 
 }
