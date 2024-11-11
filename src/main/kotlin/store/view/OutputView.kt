@@ -46,11 +46,9 @@ class OutputView {
     }
     fun displayResult(receipt: Receipt){
         println(String.format("%30s","=".repeat(30)))
-        println(String.format("%-14s %-7d %-7s","총구매액",receipt.entireProduct.size,String.format("%,d", receipt.totalPrice)))
-        val discountPromotion = if(receipt.discountPromotion==0)"0" else "-${String.format("%,d", receipt.discountPromotion)}"
-        println(String.format("%-14s %-7s %-7s","행사할인","",discountPromotion))
-        val discountMembership = if(receipt.discountMembership==0)"0" else "-${String.format("%,d", receipt.discountMembership)}"
-        println(String.format("%-14s %-7s %-7s","멤버십할인","",discountMembership))
+        println(String.format("%-14s %-7d %-7s","총구매액",receipt.getTotalCount(),String.format("%,d", receipt.totalPrice)))
+        println(String.format("%-14s %-7s %-7s","행사할인","","-${String.format("%,d", receipt.discountPromotion)}"))
+        println(String.format("%-14s %-7s %-7s","멤버십할인","", "-${String.format("%,d", receipt.discountMembership)}"))
         println(String.format("%-14s %-7s %-7s","내실돈","",String.format("%,d", receipt.resultPrice)))
     }
 

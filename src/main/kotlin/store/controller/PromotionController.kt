@@ -63,7 +63,8 @@ class PromotionController(
             if (remainder == 0) receipt.addPromotion(product, purchaseQuantity)
             else if (remainder == promotion.buy) {
                 isPossibleAddExtraItem(product, purchaseQuantity)
-            } else if (remainder < promotion.buy) { //
+            } else if (remainder < promotion.buy) {
+                receipt.addPromotion(product, purchaseQuantity - remainder)
                 confirmNoDisCount(product, remainder)
             }
         }

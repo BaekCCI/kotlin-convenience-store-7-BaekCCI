@@ -1,7 +1,6 @@
 package store.model
 
-const val ITEM_REGEX = "^\\[\\S+-\\d+](,\\[\\S+-\\d+])*?$"
-//const val ITEM_REGEX = "^\\[\\S+-\\d+](,\\[\\S+-\\d+])*?$|^\\S+-\\d+$"
+const val ITEM_REGEX = "^\\[[^,\\[\\]]+-\\d+](,\\[[^,\\[\\]]+-\\d+])*?$"
 
 class Purchase(val items: String, val productManagement: ProductManagement) {
     private val cart: MutableMap<String, Int> = mutableMapOf()
@@ -55,21 +54,24 @@ class Purchase(val items: String, val productManagement: ProductManagement) {
     fun get(): MutableMap<String, Int> {
         return cart
     }
-    fun cancelPurchase(name : String, quantity : Int){
+
+    fun cancelPurchase(name: String, quantity: Int) {
         println(cart)
-        if(cart.containsKey(name)){
+        if (cart.containsKey(name)) {
             val currentQuantity = cart[name] ?: 0
-            cart[name] = currentQuantity-quantity
+            cart[name] = currentQuantity - quantity
         }
         println(cart)
     }
-    fun addPurchase(name:String,quantity : Int){
-        if(cart.containsKey(name)){
-            val currentQuantity = cart[name]?:0
-            cart[name] = currentQuantity+quantity
+
+    fun addPurchase(name: String, quantity: Int) {
+        if (cart.containsKey(name)) {
+            val currentQuantity = cart[name] ?: 0
+            cart[name] = currentQuantity + quantity
         }
     }
-    fun getResult(){
+
+    fun getResult() {
 
     }
 

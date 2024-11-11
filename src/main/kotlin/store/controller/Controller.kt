@@ -4,9 +4,6 @@ import store.model.*
 import store.view.InputView
 import store.view.OutputView
 
-const val ITEM_REGEX = "^\\[\\S+-\\d+](,\\[\\S+-\\d+])*?$|^\\S+-\\d+$"
-
-
 class Controller {
     private val inputView = InputView()
     private val outputView = OutputView()
@@ -18,26 +15,28 @@ class Controller {
         do {
             displayProduct()
             val items = getItems()
-            val promotionController = PromotionController(items, productManagement,receipt)
+            val promotionController = PromotionController(items, productManagement, receipt)
             promotionController.startCheckPromotion()
             val membershipController = MembershipController(receipt)
             membershipController.startMembership()
             displayReceipt()
             productManagement.updateProduct(receipt)
-        } while (checkAdditionalPurchase()=="y")
+        } while (checkAdditionalPurchase() == "y")
     }
-    fun displayProduct(){
+
+    private fun displayProduct() {
         val products = productManagement.get()
         outputView.printWelcome()
         products.forEach {
-            outputView.printProducts(it.name,it.price,it.quantity, it.promotion?.name)
+            outputView.printProducts(it.name, it.price, it.quantity, it.promotion?.name)
         }
     }
-    fun displayReceipt(){
+
+    private fun displayReceipt() {
         outputView.printReceipt(receipt)
     }
 
-    fun getItems(): Purchase {
+    private fun getItems(): Purchase {
         while (true) {
             try {
                 val items = inputView.readItem()
@@ -47,9 +46,11 @@ class Controller {
             }
         }
     }
-    fun checkAdditionalPurchase():String{
-        while(true) {
+
+    private fun checkAdditionalPurchase(): String {
+        while (true) {
             try {
+                receipt.reset()
                 val input = inputView.checkAdditionalPurchase().lowercase()
                 require(validYesOrNo(input)) { "[ERROR] 잘못된 입력입니다. 다시 입력해 주세요." }
                 return input
@@ -58,6 +59,7 @@ class Controller {
             }
         }
     }
+
     private fun validYesOrNo(input: String): Boolean {
         return input == "y" || input == "n"
     }

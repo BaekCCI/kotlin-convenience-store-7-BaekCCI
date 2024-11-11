@@ -1,7 +1,7 @@
 package store.model
 
 class Receipt {
-    val entireProduct: MutableMap<Product,Int> = mutableMapOf()
+    val entireProduct: MutableMap<Product, Int> = mutableMapOf()
     val generalProduct: MutableMap<Product, Int> = mutableMapOf()
     val promotionProduct: MutableMap<Product, Int> = mutableMapOf()
     val extraProduct: MutableMap<Product, Int> = mutableMapOf()
@@ -20,16 +20,14 @@ class Receipt {
         addExtraProduct()
         setTotalPrice()
         setDiscountPromotion()
-        println(entireProduct)
-        println(generalProduct)
-        println(promotionProduct)
     }
-    private fun setEntireProduct(){
-        generalProduct.forEach { (product,quantity)->
-            entireProduct[product]=entireProduct.getOrDefault(product,0)+quantity
+
+    private fun setEntireProduct() {
+        generalProduct.forEach { (product, quantity) ->
+            entireProduct[product] = entireProduct.getOrDefault(product, 0) + quantity
         }
-        promotionProduct.forEach { (product,quantity)->
-            entireProduct[product]=entireProduct.getOrDefault(product,0)+quantity
+        promotionProduct.forEach { (product, quantity) ->
+            entireProduct[product] = entireProduct.getOrDefault(product, 0) + quantity
         }
     }
 
@@ -66,11 +64,12 @@ class Receipt {
         extraProduct.forEach { (product, quantity) ->
             discountPromotion += product.price * quantity
         }
+
     }
 
     fun setDiscountMembership() {
         generalProduct.forEach { (product, quantity) ->
-            discountMembership += (product.price * quantity * 0.3f).toInt()
+            discountMembership += (product.price * quantity * 0.3).toInt()
         }
         if (discountMembership >= 8000) discountMembership = 8000
     }
@@ -78,5 +77,22 @@ class Receipt {
     fun setResultPrice() {
         resultPrice = totalPrice - discountPromotion - discountMembership.toInt()
     }
+    fun getTotalCount():Int{
+        var totalCount = 0
+        entireProduct.forEach { (product,quantity)->
+            totalCount+=quantity
+        }
+        return totalCount
+    }
 
+    fun reset() {
+        entireProduct.clear()
+        generalProduct.clear()
+        promotionProduct.clear()
+        extraProduct.clear()
+        totalPrice = 0
+        discountPromotion = 0
+        discountMembership = 0
+        resultPrice = 0
+    }
 }
