@@ -69,7 +69,7 @@ class Receipt {
 
     fun setDiscountMembership() {
         generalProduct.forEach { (product, quantity) ->
-            discountMembership += (product.price * quantity * 0.3).toInt()
+            discountMembership += (product.price.toFloat() * quantity.toFloat() * 0.3f).toInt()
         }
         if (discountMembership >= 8000) discountMembership = 8000
     }
